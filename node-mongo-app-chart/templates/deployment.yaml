@@ -24,7 +24,7 @@ spec:
       initContainers:
       - name: init-{{ .Chart.Name }}
         image: busybox:1.28
-        command: ['sh', '-c', "until telnet <mongodb_server_name> 27017"] ## here you should probably pass this through the values file for a name, or you can use the helpers
+        command: ['sh', '-c', "until telnet <mongodb_server_name> 27017; do echo waiting for myservice; sleep 2; done"] ## here you should probably pass this through the values file for a name, or you can use the helpers
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
