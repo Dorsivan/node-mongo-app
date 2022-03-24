@@ -20,6 +20,11 @@ spec:
       labels:
         {{- include "mychart.selectorLabels" . | nindent 8 }}
     spec:
+      ### Option 1
+      initContainers:
+      - name: init-{{ .Chart.Name }}
+        image: busybox:1.28
+        command: ['sh', '-c', "until telnet <mongodb_server_name> 27017"] ## here you should probably pass this through the values file for a name, or you can use the helpers
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -39,6 +44,16 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      ### Option 2
+      livenessProbe:
+        httpGet:
+          path: /api/info ## Some endpoint
+          port: http
+        initialDelaySeconds: 60 
+        periodSeconds: 15
+        timeoutSeconds: 5
+        successThreshold: 1
+        failureThreshold: 5
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
